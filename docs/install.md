@@ -25,8 +25,8 @@ Paths:
 ## hud plugin (Claude Code)
 
 `hud/` is a Claude Code plugin that gives the model `mcp__hud__nag_*` tools, a
-`/hud` pane for browsing todos, and a row above the prompt showing the focused todo
-and rate-limit usage. It calls the `nag` CLI on `$PATH`, so run `./install.sh` first.
+`/hud` pane for browsing todos, a `/hud procs` pane for background processes, and a
+row above the prompt showing the focused todo, running processes and rate-limit usage. It calls the `nag` CLI on `$PATH`, so run `./install.sh` first.
 
 Load it by adding the folder to the `env` block of `~/.claude/settings.json`
 (absolute path; join several plugin folders with `:`):

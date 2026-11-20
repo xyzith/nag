@@ -21,6 +21,32 @@ export type BandParts = {
   now: number
 }
 
+export type ProcRow = { pid: number; ppid: number; etimes: number; rss: number; comm: string; args: string }
+
+export type TreeRow = { pid: number; depth: number; etimes: number; rss: number; args: string }
+
+export type SessionSummary = {
+  pid: number
+  name: string | null
+  etimes: number
+  rss: number
+  childCount: number
+  childRss: number
+  isSelf: boolean
+}
+
+export type Leftover = { pid: number; args: string; etimes: number; rss: number; ownerName: string | null }
+
+export type EngineTask = { id: string; type: string; status: string; description: string }
+
+export type ProcsView = {
+  selfPid: number | null
+  selfRss: number
+  tree: TreeRow[]
+  sessions: SessionSummary[]
+  leftovers: Leftover[]
+}
+
 declare module 'claude-code' {
   interface PluginState {
     hud: {
@@ -30,6 +56,8 @@ declare module 'claude-code' {
       previewOffset: number
       error: string | null
       band: BandParts
+      procs: ProcsView
+      tasks: EngineTask[]
     }
   }
 }

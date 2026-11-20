@@ -7,7 +7,7 @@ Claude 會讀寫同一份待辦；prompt 上方隨時顯示目前 focus 的那�
 |------|------|--------|
 | CLI | `bin/nag.js` | 零依賴的 Node 指令，資料存在 `~/.local/state/nag/todos.json` |
 | skill | `skills/nag` | 告訴 Claude 什麼時候該查、該記、該標完成 |
-| hud plugin | `hud/` | 給 model 的 `mcp__hud__nag_*` 工具、`/hud` 面板、prompt 上方的 nag／額度列 |
+| hud plugin | `hud/` | 給 model 的 `mcp__hud__nag_*` 工具、`/hud` 面板、prompt 上方的 nag／背景作業／額度列 |
 
 ## 安裝
 
@@ -39,7 +39,8 @@ cd nag && ./install.sh          # 建 ~/.local/bin/nag 和 ~/.claude/skills/nag 
 - 「記一下：…」→ 新增
 - 「這筆做完了」→ 確認後標 done
 
-`/hud` 打開待辦面板（點 prompt 上方的 📋 也可以）。
+`/hud` 打開待辦面板（點 prompt 上方的 📋 也可以）。`/hud procs`（或按 `p`、點 ⚙）打開背景作業面板：
+列出各 session 底下還在跑的程式，session 結束後殘留的程式會標 ⚠ 並可直接 kill。
 
 **在終端機**：
 
