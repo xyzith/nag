@@ -1,0 +1,14 @@
+{
+  "name": "nag",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "nag": "bin/nag.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

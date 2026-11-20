@@ -1,0 +1,6 @@
+{
+  "name": "hud",
+  "version": "0.1.0",
+  "description": "Personal session HUD: nag todos, background work, quota",
+  "types": "./types/index.d.ts"
+}
