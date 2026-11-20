@@ -14,7 +14,7 @@ Claude 會讀寫同一份待辦；prompt 上方隨時顯示目前 focus 的那�
 需要 Node 18 以上，`~/.local/bin` 要在 `$PATH` 上。
 
 ```bash
-git clone git@github.com:TaylorTangTcg/nag.git
+git clone git@github.com:xyzith/nag.git
 cd nag && ./install.sh          # 建 ~/.local/bin/nag 和 ~/.claude/skills/nag 的 symlink
 ```
 
