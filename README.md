@@ -49,9 +49,14 @@ nag                      # 列出未完成的待辦
 nag add --title "修 X" --desc "細節" --ref https://...
 nag show 3               # 看第 3 筆（seq 編號固定不變，中間有跳號是正常的）
 nag done 3
+nag resume 3             # 接回 focus 在第 3 筆的 Claude session（cd 到原專案再 claude --resume）
 nag note --id 3 --text "卡在 Y"
 nag help                 # 完整指令
 ```
+
+`nag resume` 從 focus 紀錄找 session id，讀 `~/.claude/projects/*/<id>.jsonl` 取得原本的 cwd；多個 session focus 同一筆時接最近活動的那個。
+在終端機裡會開 `$SHELL -ic` 執行（吃得到 `.bashrc` 的 `claude` alias），非 TTY、在 Claude session 內，或加 `--print` 時只印出指令。
+`NAG_CLAUDE` 可換掉 `claude` 這個指令名。done／ignore／unfocus 會清掉 focus，之後就接不回了。
 
 ## 從外部來源同步（選用）
 

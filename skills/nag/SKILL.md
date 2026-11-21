@@ -22,6 +22,7 @@ The user picks tasks by `seq` (permanent per task; gaps are normal), never by id
 | 「處理2」「做第N個」「挖一個來做」 | `nag_show` (focuses this session) → read `desc`, `ref`, `sourceMeta`, `note`; propose a plan and confirm scope, then work here |
 | 「task 3 寫什麼」「先看一下不用做」 | `nag_show` with `focus: false` |
 | 「這個先放著」「換別的」 | `nag_unfocus` |
+| 「接回 #3 那個 session」「之前做 3 的對話」 | `nag resume 3` in Bash: inside a session it only prints `cd … && claude --resume <id>`; give that line to the user to run in a terminal (it can't take over this one) |
 | 「記一下…」「add … to my todo」 | `nag_add`, echo back what was added |
 | 「做完了」「這筆 done」 | confirm, then `nag_done` |
 

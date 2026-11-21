@@ -9,6 +9,7 @@ import { addItem, findItem, markDone, ignoreItem, removeItem, addNote, addRef, s
 import { formatList, formatShow, formatStatus, shouldRenderMarkdown } from '../src/format.js'
 import { fetchAll } from '../src/sync.js'
 import { mergeSource } from '../src/merge.js'
+import { claudeProjectsDir, sessionsForItem, resumeCommand } from '../src/resume.js'
 
 const argv = process.argv.slice(2)
 // Bare `nag` defaults to the list — the user's most-used view. Subcommands and
@@ -31,6 +32,7 @@ const USAGE = {
   rm: 'usage: nag rm <id|seq>   (--id also accepted)',
   focus: 'usage: nag focus <id|seq> [--session <id>]   (--id also accepted)',
   unfocus: 'usage: nag unfocus [--session <id>]',
+  resume: 'usage: nag resume <id|seq> [--print] [--json]   (--id also accepted)',
   note: 'usage: nag note --id <id|seq> --text <text>',
   ref: 'usage: nag ref --id <id|seq> --url <url>',
   update: 'usage: nag update <id|seq> [--title <t>] [--desc <t>] [--from <who>] [--note <t>] [--status <open|done|ignored>] [--ref <url>]... [--clear-refs]   (--id also accepted)',
@@ -51,6 +53,7 @@ usage: nag [command]
   rm             delete a task (<id|seq>)
   focus          set this session's focused task (<id|seq>)
   unfocus        clear this session's focused task
+  resume         reopen the Claude session focused on a task (<id|seq>, --print, --json)
   note           append a note to a task (--id <id|seq>, --text <text>)
   ref            attach a reference link to a task (--id <id|seq>, --url <url>)
   update         edit an existing task in place (<id|seq>, --title, --desc, --from, --note, --status, --ref, --clear-refs)
@@ -58,7 +61,7 @@ usage: nag [command]
   status         one-line status (--session <id>, --color, --json)
   help           show this help
 
-done/ignore/rm/show/focus take the id as a bare positional (or --id); add -h/--help to any command for its usage.`
+done/ignore/rm/show/focus/resume take the id as a bare positional (or --id); add -h/--help to any command for its usage.`
 
 // Positionals are allowed only for the subject commands (which pass a bare id);
 // everywhere else they're a mistake and rejected with the command's usage.
@@ -225,6 +228,39 @@ async function main() {
       withStore((store) => clearFocus(store, sid))
       console.log('unfocus')
       break
+    }
+    case 'resume': {
+      const { values, positionals } = parse(cmd, rest, {
+        id: { type: 'string' },
+        print: { type: 'boolean' },
+        json: { type: 'boolean' },
+      }, true)
+      const ref = idRef(values, positionals, 'resume')
+      const item = findItem(readStore(), ref)
+      const sessions = sessionsForItem(readStore(), item.id, claudeProjectsDir())
+      if (values.json) {
+        console.log(JSON.stringify({ id: item.id, seq: item.seq, title: item.title, sessions }, null, 2))
+        break
+      }
+      if (sessions.length === 0) {
+        console.error(`#${item.seq} ${item.title}: no session is focused on it`)
+        process.exit(1)
+      }
+      const s = sessions[0]
+      const command = resumeCommand(s, process.env.NAG_CLAUDE || 'claude')
+      // Only hand over the terminal to a human: from a pipe, an agent's Bash
+      // tool, or with --print, just emit the command line.
+      if (values.print || !process.stdin.isTTY || !process.stdout.isTTY || process.env.CLAUDE_CODE_SESSION_ID) {
+        console.log(command)
+        break
+      }
+      if (!s.cwd) console.error(`warning: transcript for ${s.sessionId} not found; resuming from the current dir`)
+      if (sessions.length > 1) console.error(`(${sessions.length} sessions focused on #${item.seq}; resuming the most recent)`)
+      console.error(`resume #${item.seq} ${item.title}\n$ ${command}`)
+      // Interactive shell (sources ~/.bashrc) so the user's `claude` alias/PATH applies.
+      const r = spawnSync(process.env.SHELL || 'bash', ['-ic', command], { stdio: 'inherit' })
+      if (r.error) throw r.error
+      process.exit(r.status ?? 1)
     }
     case 'done':
     case 'ignore':
